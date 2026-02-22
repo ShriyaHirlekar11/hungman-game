@@ -2,18 +2,20 @@
 <html>
 <head>
     <title>Hangman Game</title>
-<!-- Privacy-friendly analytics by Plausible -->
-<!-- Privacy-friendly analytics by Plausible -->
-<script async src="https://plausible.io/js/pa-n2jogaiCsPUJYakMGN7iG.js"></script>
-<script>
-  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
-  plausible.init()
-</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-n2jogaiCsPUJYakMGN7iG.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
 
     <!-- Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
+
         body {
             margin: 0;
             font-family: "Segoe UI", sans-serif;
@@ -29,20 +31,22 @@
             margin-top: 20px;
             font-size: 36px;
             color: #c94f7c;
+            text-align: center;
         }
 
         .container {
-            width: 80%;
+            width: 95%;
             max-width: 1000px;
             text-align: center;
             margin-top: 20px;
+            padding: 10px;
         }
 
-        /* 🌸 Lives Display (Top Right) */
+        /* Lives Display */
         .lives-box {
             position: absolute;
             top: 20px;
-            right: 30px;
+            right: 20px;
             font-weight: bold;
             font-size: 16px;
             color: #8b3a62;
@@ -56,11 +60,17 @@
             box-shadow: 0 8px 25px rgba(0,0,0,0.1);
             animation: fadeIn 0.5s ease-in-out;
             width: 250px;
+            max-width: 100%;
+        }
+
+        svg {
+            max-width: 100%;
+            height: auto;
         }
 
         .word-display {
-            font-size: 32px;
-            letter-spacing: 12px;
+            font-size: 6vw;
+            letter-spacing: 8px;
             margin: 20px 0;
         }
 
@@ -73,8 +83,10 @@
         }
 
         .keyboard button {
-            width: 45px;
-            height: 45px;
+            width: 10vw;
+            height: 10vw;
+            max-width: 45px;
+            max-height: 45px;
             margin: 5px;
             border-radius: 8px;
             border: none;
@@ -108,6 +120,7 @@
         .wrong-letters {
             margin-top: 10px;
             color: #a9446e;
+            word-wrap: break-word;
         }
 
         .win { color: #4caf50; }
@@ -118,7 +131,6 @@
             to {opacity: 1;}
         }
 
-        /* 🌸 Stickman Animations */
         .fade-part {
             animation: appear 0.5s ease-in-out;
         }
@@ -136,6 +148,31 @@
         @keyframes swingAnim {
             from { transform: rotate(-5deg); }
             to { transform: rotate(5deg); }
+        }
+
+        /* 📱 Mobile Specific Adjustments */
+        @media (max-width: 600px) {
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .hangman-box {
+                width: 90%;
+                padding: 10px;
+            }
+
+            .keyboard button {
+                width: 12vw;
+                height: 12vw;
+                font-size: 12px;
+            }
+
+            .lives-box {
+                font-size: 12px;
+                right: 10px;
+            }
+
         }
 
     </style>
@@ -168,11 +205,9 @@
 
 {% if word %}
 
-<!-- 🌸 Animated SVG Stickman -->
 <div class="hangman-box">
 <svg width="200" height="250" viewBox="0 0 200 250">
 
-    <!-- Gallows -->
     <line x1="20" y1="230" x2="180" y2="230" stroke="#5a3e4d" stroke-width="4"/>
     <line x1="60" y1="230" x2="60" y2="40" stroke="#5a3e4d" stroke-width="4"/>
     <line x1="60" y1="40" x2="130" y2="40" stroke="#5a3e4d" stroke-width="4"/>
@@ -181,23 +216,18 @@
     {% if wrong >= 1 %}
     <circle cx="130" cy="80" r="20" stroke="#8b3a62" stroke-width="3" fill="none" class="fade-part"/>
     {% endif %}
-
     {% if wrong >= 2 %}
     <line x1="130" y1="100" x2="130" y2="150" stroke="#8b3a62" stroke-width="3" class="fade-part"/>
     {% endif %}
-
     {% if wrong >= 3 %}
     <line x1="130" y1="115" x2="110" y2="135" stroke="#8b3a62" stroke-width="3" class="fade-part"/>
     {% endif %}
-
     {% if wrong >= 4 %}
     <line x1="130" y1="115" x2="150" y2="135" stroke="#8b3a62" stroke-width="3" class="fade-part"/>
     {% endif %}
-
     {% if wrong >= 5 %}
     <line x1="130" y1="150" x2="110" y2="180" stroke="#8b3a62" stroke-width="3" class="fade-part"/>
     {% endif %}
-
     {% if wrong >= 6 %}
     <line x1="130" y1="150" x2="150" y2="180" stroke="#8b3a62" stroke-width="3" class="fade-part swing"/>
     {% endif %}
@@ -226,37 +256,9 @@
 
 {% if message == "win" %}
     <h3 class="win">🎉 Congratulations! You Won!</h3>
-    <script>
-        confetti({
-            particleCount: 200,
-            spread: 80,
-            origin: { y: 0.6 }
-        });
-    </script>
-
-    <form method="POST">
-        <select name="difficulty">
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-        </select>
-        <button class="main-btn" type="submit">Play Again</button>
-    </form>
-
 {% elif message == "lose" %}
     <h3 class="lose">❌ Game Over! Word was "{{ word }}"</h3>
-
-    <form method="POST">
-        <select name="difficulty">
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-        </select>
-        <button class="main-btn" type="submit">Play Again</button>
-    </form>
-
 {% else %}
-
 <div class="keyboard">
     {% for letter in 'abcdefghijklmnopqrstuvwxyz' %}
         <form method="POST" style="display:inline;">
@@ -268,13 +270,10 @@
         </form>
     {% endfor %}
 </div>
-
-{% endif %}
 {% endif %}
 
+{% endif %}
 </div>
 
 </body>
-
 </html>
-
