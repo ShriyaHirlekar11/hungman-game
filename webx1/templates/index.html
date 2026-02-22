@@ -4,13 +4,6 @@
     <title>Hangman Game</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Privacy-friendly analytics by Plausible -->
-    <script async src="https://plausible.io/js/pa-n2jogaiCsPUJYakMGN7iG.js"></script>
-    <script>
-      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
-      plausible.init()
-    </script>
-
     <!-- Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -42,7 +35,6 @@
             padding: 10px;
         }
 
-        /* Lives Display */
         .lives-box {
             position: absolute;
             top: 20px;
@@ -58,7 +50,6 @@
             background: white;
             border-radius: 16px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            animation: fadeIn 0.5s ease-in-out;
             width: 250px;
             max-width: 100%;
         }
@@ -126,53 +117,11 @@
         .win { color: #4caf50; }
         .lose { color: #e53935; }
 
-        @keyframes fadeIn {
-            from {opacity: 0;}
-            to {opacity: 1;}
-        }
-
-        .fade-part {
-            animation: appear 0.5s ease-in-out;
-        }
-
-        @keyframes appear {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .swing {
-            transform-origin: top center;
-            animation: swingAnim 1s infinite alternate ease-in-out;
-        }
-
-        @keyframes swingAnim {
-            from { transform: rotate(-5deg); }
-            to { transform: rotate(5deg); }
-        }
-
-        /* 📱 Mobile Specific Adjustments */
         @media (max-width: 600px) {
-
-            h1 {
-                font-size: 24px;
-            }
-
-            .hangman-box {
-                width: 90%;
-                padding: 10px;
-            }
-
-            .keyboard button {
-                width: 12vw;
-                height: 12vw;
-                font-size: 12px;
-            }
-
-            .lives-box {
-                font-size: 12px;
-                right: 10px;
-            }
-
+            h1 { font-size: 24px; }
+            .hangman-box { width: 90%; padding: 10px; }
+            .keyboard button { width: 12vw; height: 12vw; font-size: 12px; }
+            .lives-box { font-size: 12px; right: 10px; }
         }
 
     </style>
@@ -214,22 +163,22 @@
     <line x1="130" y1="40" x2="130" y2="60" stroke="#5a3e4d" stroke-width="4"/>
 
     {% if wrong >= 1 %}
-    <circle cx="130" cy="80" r="20" stroke="#8b3a62" stroke-width="3" fill="none" class="fade-part"/>
+    <circle cx="130" cy="80" r="20" stroke="#8b3a62" stroke-width="3" fill="none"/>
     {% endif %}
     {% if wrong >= 2 %}
-    <line x1="130" y1="100" x2="130" y2="150" stroke="#8b3a62" stroke-width="3" class="fade-part"/>
+    <line x1="130" y1="100" x2="130" y2="150" stroke="#8b3a62" stroke-width="3"/>
     {% endif %}
     {% if wrong >= 3 %}
-    <line x1="130" y1="115" x2="110" y2="135" stroke="#8b3a62" stroke-width="3" class="fade-part"/>
+    <line x1="130" y1="115" x2="110" y2="135" stroke="#8b3a62" stroke-width="3"/>
     {% endif %}
     {% if wrong >= 4 %}
-    <line x1="130" y1="115" x2="150" y2="135" stroke="#8b3a62" stroke-width="3" class="fade-part"/>
+    <line x1="130" y1="115" x2="150" y2="135" stroke="#8b3a62" stroke-width="3"/>
     {% endif %}
     {% if wrong >= 5 %}
-    <line x1="130" y1="150" x2="110" y2="180" stroke="#8b3a62" stroke-width="3" class="fade-part"/>
+    <line x1="130" y1="150" x2="110" y2="180" stroke="#8b3a62" stroke-width="3"/>
     {% endif %}
     {% if wrong >= 6 %}
-    <line x1="130" y1="150" x2="150" y2="180" stroke="#8b3a62" stroke-width="3" class="fade-part swing"/>
+    <line x1="130" y1="150" x2="150" y2="180" stroke="#8b3a62" stroke-width="3"/>
     {% endif %}
 
 </svg>
@@ -256,9 +205,38 @@
 
 {% if message == "win" %}
     <h3 class="win">🎉 Congratulations! You Won!</h3>
+
+    <script>
+        confetti({
+            particleCount: 200,
+            spread: 100,
+            origin: { y: 0.6 }
+        });
+    </script>
+
+    <form method="POST">
+        <select name="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+        <button class="main-btn" type="submit">Play Again</button>
+    </form>
+
 {% elif message == "lose" %}
     <h3 class="lose">❌ Game Over! Word was "{{ word }}"</h3>
+
+    <form method="POST">
+        <select name="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+        <button class="main-btn" type="submit">Play Again</button>
+    </form>
+
 {% else %}
+
 <div class="keyboard">
     {% for letter in 'abcdefghijklmnopqrstuvwxyz' %}
         <form method="POST" style="display:inline;">
@@ -270,9 +248,10 @@
         </form>
     {% endfor %}
 </div>
-{% endif %}
 
 {% endif %}
+{% endif %}
+
 </div>
 
 </body>
