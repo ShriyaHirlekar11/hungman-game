@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hangman Game</title>
+
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: linear-gradient(to bottom, #ffe6f0, #fff0f5);
+            color: #5a3e4d;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            margin-top: 20px;
+            font-size: 36px;
+            color: #c94f7c;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 1000px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* 🌸 Lives Display (Top Right) */
+        .lives-box {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-weight: bold;
+            font-size: 16px;
+            color: #8b3a62;
+        }
+
+        .hangman-box {
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s ease-in-out;
+            width: 250px;
+        }
+
+        .word-display {
+            font-size: 32px;
+            letter-spacing: 12px;
+            margin: 20px 0;
+        }
+
+        .keyboard {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        .keyboard button {
+            width: 45px;
+            height: 45px;
+            margin: 5px;
+            border-radius: 8px;
+            border: none;
+            background-color: #f7b6d2;
+            color: #5a3e4d;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .keyboard button:hover {
+            background-color: #f48fb1;
+            transform: scale(1.05);
+        }
+
+        .keyboard button:disabled {
+            background-color: #e0c2d1;
+            cursor: not-allowed;
+        }
+
+        select, button.main-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            background-color: #f7b6d2;
+            color: #5a3e4d;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .wrong-letters {
+            margin-top: 10px;
+            color: #a9446e;
+        }
+
+        .win { color: #4caf50; }
+        .lose { color: #e53935; }
+
+        @keyframes fadeIn {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+
+        /* 🌸 Stickman Animations */
+        .fade-part {
+            animation: appear 0.5s ease-in-out;
+        }
+
+        @keyframes appear {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .swing {
+            transform-origin: top center;
+            animation: swingAnim 1s infinite alternate ease-in-out;
+        }
+
+        @keyframes swingAnim {
+            from { transform: rotate(-5deg); }
+            to { transform: rotate(5deg); }
+        }
+
+    </style>
+</head>
+<body>
+
+<h1>🌸 Hangman Game 🌸</h1>
+<h3>Score: {{ score }}</h3>
+
+{% if word %}
+<div class="lives-box">
+    {% set filled = 6 - wrong %}
+    {% set empty = wrong %}
+    [{{ "█" * filled }}{{ "░" * empty }}] {{ filled }} / 6 lives left
+</div>
+{% endif %}
+
+<div class="container">
+
+{% if not word %}
+<form method="POST">
+    <select name="difficulty">
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+    </select>
+    <button class="main-btn" type="submit">Start Game</button>
+</form>
+{% endif %}
+
+{% if word %}
+
+<!-- 🌸 Animated SVG Stickman -->
+<div class="hangman-box">
+<svg width="200" height="250" viewBox="0 0 200 250">
+
+    <!-- Gallows -->
+    <line x1="20" y1="230" x2="180" y2="230" stroke="#5a3e4d" stroke-width="4"/>
+    <line x1="60" y1="230" x2="60" y2="40" stroke="#5a3e4d" stroke-width="4"/>
+    <line x1="60" y1="40" x2="130" y2="40" stroke="#5a3e4d" stroke-width="4"/>
+    <line x1="130" y1="40" x2="130" y2="60" stroke="#5a3e4d" stroke-width="4"/>
+
+    {% if wrong >= 1 %}
+    <circle cx="130" cy="80" r="20" stroke="#8b3a62" stroke-width="3" fill="none" class="fade-part"/>
+    {% endif %}
+
+    {% if wrong >= 2 %}
+    <line x1="130" y1="100" x2="130" y2="150" stroke="#8b3a62" stroke-width="3" class="fade-part"/>
+    {% endif %}
+
+    {% if wrong >= 3 %}
+    <line x1="130" y1="115" x2="110" y2="135" stroke="#8b3a62" stroke-width="3" class="fade-part"/>
+    {% endif %}
+
+    {% if wrong >= 4 %}
+    <line x1="130" y1="115" x2="150" y2="135" stroke="#8b3a62" stroke-width="3" class="fade-part"/>
+    {% endif %}
+
+    {% if wrong >= 5 %}
+    <line x1="130" y1="150" x2="110" y2="180" stroke="#8b3a62" stroke-width="3" class="fade-part"/>
+    {% endif %}
+
+    {% if wrong >= 6 %}
+    <line x1="130" y1="150" x2="150" y2="180" stroke="#8b3a62" stroke-width="3" class="fade-part swing"/>
+    {% endif %}
+
+</svg>
+</div>
+
+<div class="word-display">
+    {% for letter in word %}
+        {% if letter in guessed %}
+            {{ letter }}
+        {% else %}
+            _
+        {% endif %}
+    {% endfor %}
+</div>
+
+<div class="wrong-letters">
+    Wrong Letters:
+    {% for letter in guessed %}
+        {% if letter not in word %}
+            {{ letter }}
+        {% endif %}
+    {% endfor %}
+</div>
+
+{% if message == "win" %}
+    <h3 class="win">🎉 Congratulations! You Won!</h3>
+    <script>
+        confetti({
+            particleCount: 200,
+            spread: 80,
+            origin: { y: 0.6 }
+        });
+    </script>
+
+    <form method="POST">
+        <select name="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+        <button class="main-btn" type="submit">Play Again</button>
+    </form>
+
+{% elif message == "lose" %}
+    <h3 class="lose">❌ Game Over! Word was "{{ word }}"</h3>
+
+    <form method="POST">
+        <select name="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+        <button class="main-btn" type="submit">Play Again</button>
+    </form>
+
+{% else %}
+
+<div class="keyboard">
+    {% for letter in 'abcdefghijklmnopqrstuvwxyz' %}
+        <form method="POST" style="display:inline;">
+            <input type="hidden" name="letter" value="{{ letter }}">
+            <button type="submit"
+                {% if letter in guessed %} disabled {% endif %}>
+                {{ letter.upper() }}
+            </button>
+        </form>
+    {% endfor %}
+</div>
+
+{% endif %}
+{% endif %}
+
+</div>
+
+</body>
+</html>
